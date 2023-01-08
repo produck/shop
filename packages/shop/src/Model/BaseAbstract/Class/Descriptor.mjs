@@ -13,13 +13,18 @@ export const MemberSchema = S.Object({
 	methods: MethodsSchema,
 });
 
-export const nameSchema = P.StringPattern(/^[A-Z][A-za-z0-9]*$/)('Any');
+export const NameSchema = P.StringPattern(/^[A-Z][A-za-z0-9]*$/)('Any');
+export const SuperSchema = P.Function(Object);
 
-export const Schema = S.Object({
-	name: nameSchema,
-	Super: P.Function(Object),
+export const FieldsSchemas = {
 	Prototype: MemberSchema,
 	Static: MemberSchema,
+};
+
+export const Schema = S.Object({
+	name: NameSchema,
+	Super: SuperSchema,
+	...FieldsSchemas,
 });
 
 export const normalize = Normalizer(Schema);

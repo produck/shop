@@ -1,24 +1,27 @@
-import { Normalizer, P, PROPERTY, S } from '@produck/mold';
+import { Normalizer, P, S } from '@produck/mold';
+import * as BaseAbstract from './BaseAbstract/index.mjs';
 
-const GettersSchema = S.Object({ [PROPERTY]: P.Function() });
-const MethodsSchema = S.Object({ [PROPERTY]: P.OrNull(P.Function()) });
+const { ComponentSchemas } = BaseAbstract.Descriptor;
 
-const MemberDescriptorSchema = S.Object({
-	getters: GettersSchema,
-	methods: MethodsSchema,
-});
-
-const ClassDescriptorSchema = S.Object({
-	Prototype: MemberDescriptorSchema,
-	Static: MemberDescriptorSchema,
+const NativeSchema = S.Object({
+	Prototype: S.Object({
+		reload: P.Boolean(true),
+		update: P.Boolean(true),
+		destroy: P.Boolean(true),
+	}),
+	Static: S.Object({
+		create: P.Boolean(true),
+		query: P.Boolean(true),
+		has: P.Boolean(true),
+		get: P.Boolean(true),
+	}),
 });
 
 export const Schema = S.Object({
-	name: P.StringPattern(/^[A-Z][A-za-z0-9]*$/),
-	Super: P.Function(Object),
-	Abstract: ClassDescriptorSchema,
-	Base: ClassDescriptorSchema,
-	Filter: S.Object(),
+	name: BaseAbstract.Class.Descriptor.NameSchema,
+	Data: P.Function(() => ({})),
+	...ComponentSchemas,
+	Native: NativeSchema,
 });
 
 export const normalize = Normalizer(Schema);

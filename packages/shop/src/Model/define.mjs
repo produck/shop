@@ -1,40 +1,60 @@
 import { P, PROPERTY, S } from '@produck/mold';
+
+import * as BaseAbstract from './BaseAbstract/index.mjs';
 import * as Descriptor from './Descriptor.mjs';
+import { methods as NativeMethod } from './Native.mjs';
 
-function AbstractModelClass(name, Super = Object) {
-	const CLASS_NAME = `Abstract${name}`;
-
-	return { [CLASS_NAME]: class extends Object {
-		_Instance = null;
-	} }[CLASS_NAME];
-}
-
-function BaseModelClass(name, AbstracModel, descriptor) {
-	const CLASS_NAME = `Base${name}`;
-
-	return { [CLASS_NAME]: class extends AbstracModel {
-
-	} }[CLASS_NAME];
-}
-
-export function defineModel(_descriptor) {
+export function defineModel(_descriptor, factory) {
 	const descriptor = Descriptor.normalize(_descriptor);
-	const AbstractModel = AbstractModelClass(descriptor.name);
-	const BaseModel = BaseModelClass(descriptor.name);
+	const { name, Data, Super, Abstract, Base, Native } = descriptor;
 
-	function define(_options) {
+	const PrototypeNative = {};
+	const StaticNative = {};
 
+	for (const name of Native.Prototype) {
+		if (Native.Prototype[name]) {
+			PrototypeNative[name] = NativeMethod[name];
+		}
 	}
 
-	const Association = {};
-
-	function hasOne() {
-
+	for (const name of Native.Static) {
+		if (Native.Static[name]) {
+			StaticNative[name] = NativeMethod[name];
+		}
 	}
 
-	function hasMany() {
+	const Model = BaseAbstract.define({
+		name,
+		Super,
+		Abstract: {
+			Prototype: {
+				...Abstract.Prototype, methods: {
+					...PrototypeNative,
+					...Abstract.Prototype.methods,
+				},
+			},
+			Static: {
+				...Abstract.Static, methods: {
+					...StaticNative,
+					...Abstract.Static.methods,
+				},
+			},
+		},
+		Base: {
+			Prototype: {
+				...Base.Prototype, methods: {
+					...PrototypeNative,
+					...Abstract.Prototype.methods,
+				},
+			},
+			Static: {
+				...Base.Static, methods: {
+					...StaticNative,
+					...Abstract.Static.methods,
+				},
+			},
+		},
+	});
 
-	}
-
-	return Object.freeze({ define });
+	return Model;
 }
