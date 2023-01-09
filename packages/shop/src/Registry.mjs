@@ -27,18 +27,16 @@ export class ShopRegistry {
 		const CLASS_NAME = `${_Custom.name}Model`;
 
 		const ModelClass = { [CLASS_NAME]: class extends _Custom {
-			#data = {};
-			#hasOneModels = {};
-			#hasManyModels = {};
+			#data = null;
+			#isNew = true;
 
-			constructor()
-
-			ToOne(Model) {
-
+			constructor(data) {
+				super();
+				this.#data = data;
 			}
 
-			ToMany(Model) {
-
+			static build(data) {
+				return new this(data, true);
 			}
 		} }[CLASS_NAME];
 

@@ -14,11 +14,11 @@ class ShopModel {
 		this.#Custom = Custom;
 	}
 
-	get Class() {
-		return this.#Custom;
+	ToOne(Model, name) {
+
 	}
 
-	hasOne(name) {
+	ToMany(Model, name) {
 
 	}
 }
