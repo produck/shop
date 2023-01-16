@@ -4,11 +4,11 @@ const assert = (source, target) => {
 
 };
 
-export function ToOne(source, target, relation) {
+export function ToOne(source, target, as) {
 	assert(source, target);
 }
 
-export function ToMany(source, target, relation) {
+export function ToMany(source, target, as) {
 	assert(source, target);
 }
 

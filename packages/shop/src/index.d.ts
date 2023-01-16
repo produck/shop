@@ -1,3 +1,20 @@
+interface FilterOptions {
+	unique?: boolean;
+	data?: any;
+	[key: string]: any;
+}
+
+interface Filter {
+	options?: FilterOptions;
+	scope?: FilterScope;
+}
+
+interface FilterScope {
+	model: string;
+	as: string;
+	filter: Filter;
+}
+
 export namespace Abstract {
 	interface Model {
 		_reload(): Promise<any>;
@@ -6,9 +23,9 @@ export namespace Abstract {
 	}
 
 	interface ModelConstructor {
-		_create?(): Promise<any>;
-		_query(): Promise<any[]>;
-		_has(): Promise<boolean>;
+		_create?(data: any): Promise<any>;
+		_query(filter: Filter): Promise<any[]>;
+		_has(filter: Filter): Promise<boolean>;
 	}
 }
 
@@ -21,18 +38,13 @@ export namespace Base {
 		destroy?(): Promise<this>;
 	}
 
-	interface Filter {
-		// unique, all,
-		name: string;
-		data: any;
-		order?: object;
-		include?: Filter;
-	}
-
 	interface ModelConstructor extends Abstract.ModelConstructor {
+		readonly name: string;
+		readonly symbol: symbol;
 		create?(): Promise<Model>;
 		query(filter: Filter): Promise<Model[]>;
-		has(): Promise<boolean>;
+		has(data: any): Promise<boolean>;
+		get(data: any): Promise<Model>;
 	}
 }
 
@@ -44,7 +56,6 @@ export namespace Custom {
 	interface ModelConstructor extends Base.ModelConstructor {
 		new (data: any): Model;
 	}
-
 }
 
 export namespace Proxy {
@@ -71,6 +82,7 @@ export function Model(
 ): Base.ModelConstructor;
 
 interface CustomOptions {
+	base: Function,
 	custom: () => Proxy.ModelConstructor;
 }
 
