@@ -19,9 +19,13 @@ function ProxyModelClass(name, Custom) {
 			super(data);
 			Registry.Data.set(this, data);
 		}
+
+		async query(filter) {
+			super.query(filter);
+		}
 	} }[CLASS_NAME];
 
-	return Proxy;
+	return Object.freeze(Proxy);
 }
 
 class CustomModelProxyPrivateMember {

@@ -22,7 +22,6 @@ function ThrowNamespace(name) {
 }
 
 function normalizeBase(_Base) {
-
 	return _Base;
 }
 
@@ -31,7 +30,16 @@ export function BaseModelClass({
 }) {
 	const CLASS_NAME = `Base${name}`;
 	const Throw = ThrowNamespace();
-	const injection = Object.freeze({ NAME: CLASS_NAME, Throw });
+
+	const injection = Object.freeze({
+		Throw, Data, clone,
+		Instance: model => Instance.get(model),
+		NAME: CLASS_NAME,
+	});
+
+	const BaseModel = normalizeBase(define(Abstract, injection));
+
+	Utils.fixClassName(BaseModel, CLASS_NAME);
 
 	const ensureDataInResult = (_data, index) => {
 		try {
@@ -57,11 +65,7 @@ export function BaseModelClass({
 		}
 	};
 
-	const BaseModel = normalizeBase(define(Abstract, injection));
-
-	Utils.fixClassName(BaseModel, CLASS_NAME);
-
-	Utils.defineMember(BaseModel, 'query', async function query(filter) {
+	Utils.defineValueMember(BaseModel, 'query', async function query(filter) {
 		const _result = await this._query(filter);
 
 		if (!Array.isArray(_result)) {
@@ -73,7 +77,8 @@ export function BaseModelClass({
 		return result.map(data => new this(data));
 	});
 
-	Utils.defineMember(BaseModel, 'has', async function has(data) {
+	Utils.defineValueMember(BaseModel, 'has', async function has(_data) {
+		const data = Data(_data);
 		const _flag = await this._has(data);
 
 		if (typeof _flag !== 'boolean') {
@@ -83,18 +88,25 @@ export function BaseModelClass({
 		return _flag;
 	});
 
-	Utils.defineMember(BaseModel, 'get', async function get(data) {
-		const _data = await this._get(data);
+	Utils.defineValueMember(BaseModel, 'get', async function get(_data) {
+		const data = Data(_data);
+		const incomingData = await this._get(data);
 
-		if (_data === null) {
+		if (incomingData === null) {
 			return null;
 		}
 
-		return new this(ensureData(_data));
+		return new this(ensureData(incomingData));
 	});
 
 	if (creatable) {
-		Utils.defineMember(BaseModel, 'create', async function create(data) {
+		Utils.defineValueMember(BaseModel, 'create', async function create(_data) {
+			const data = Data(_data);
+
+			if (await this.has(data)) {
+				Throw(`Duplicated ${name}.`);
+			}
+
 			return new this(ensureData(await this._create(data)));
 		});
 	}
@@ -102,7 +114,7 @@ export function BaseModelClass({
 	if (deletable) {
 		const callDestroy = model => model.destroy;
 
-		Utils.defineMember(BaseModel, 'remove', async function remove(filter) {
+		Utils.defineValueMember(BaseModel, 'remove', async function remove(filter) {
 			const modelList = await this.query(filter);
 
 			await Promise.all(modelList.map(callDestroy));
@@ -113,7 +125,7 @@ export function BaseModelClass({
 
 	const { prototype } = BaseModel;
 
-	Utils.defineMember(prototype, 'load', async function load() {
+	Utils.defineValueMember(prototype, 'load', async function load() {
 		const instance = Instance.get(this);
 		const copy = ensureCopy(clone(instance.data));
 		const data = ensureData(await this._load(copy));
@@ -130,7 +142,7 @@ export function BaseModelClass({
 	});
 
 	if (updatable) {
-		Utils.defineMember(prototype, 'save', async function save() {
+		Utils.defineValueMember(prototype, 'save', async function save() {
 			const instance = Instance.get(this);
 			const copy = ensureCopy(clone(instance.data));
 			const data = ensureData(await this._save(copy));
@@ -142,7 +154,7 @@ export function BaseModelClass({
 	}
 
 	if (deletable) {
-		Utils.defineMember(prototype, 'destroy', async function destroy() {
+		Utils.defineValueMember(prototype, 'destroy', async function destroy() {
 			const instance = Instance.get(this);
 			const copy = ensureCopy(clone(instance.data));
 

@@ -11,7 +11,6 @@ function AssertNamespace() {
 }
 
 function normalizeAbstract(_Abstract) {
-
 	return _Abstract;
 }
 
@@ -29,13 +28,13 @@ export function AbstractModelClass({
 			Assert.Implemented(name);
 		} }[name];
 
-		Utils.defineMember(object, name, method);
+		Utils.defineValueMember(object, name, method);
 	}
 
 	Utils.fixClassName(AbstractModel, CLASS_NAME);
 
 	if (!Object.hasOwn(AbstractModel, '_has')) {
-		Utils.defineMember(AbstractModel, '_has', function _has(data) {
+		Utils.defineValueMember(AbstractModel, '_has', function _has(data) {
 			return this._get(data) !== null;
 		});
 	}

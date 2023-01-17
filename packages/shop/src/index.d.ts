@@ -38,9 +38,9 @@ export namespace Base {
 	interface ModelConstructor extends Abstract.ModelConstructor {
 		readonly name: string;
 		readonly symbol: symbol;
-		has(data: Data): Promise<boolean>;
-		get(data: Data): Promise<Model>;
-		create?(data: Data): Promise<Model>;
+		has(_data: Data): Promise<boolean>;
+		get(_data: Data): Promise<Model>;
+		create?(_data: Data): Promise<Model>;
 		query(filter: Filter): Promise<Model[]>;
 		remove?(filter: Filter): Promise<Model[]>;
 	}

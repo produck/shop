@@ -4,7 +4,7 @@ export const BASE_DESCRIPTOR = {
 	enumerable: false,
 };
 
-export function defineMember(object, name, method) {
+export function defineValueMember(object, name, method) {
 	Object.defineProperty(object, name, {
 		...BASE_DESCRIPTOR,
 		value: method,
@@ -16,5 +16,5 @@ export const fixClassName = (Class, expectedName) => {
 		return;
 	}
 
-	defineMember(Class, 'name', expectedName);
+	defineValueMember(Class, 'name', expectedName);
 };

@@ -1,7 +1,9 @@
 import * as Registry from './Registry.mjs';
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
+
 import * as Options from './Options.mjs';
+import * as Instance from './Instance.mjs';
 
 export function define(name, _options) {
 	const options = Options.normalize(_options);
@@ -20,13 +22,14 @@ export function define(name, _options) {
 		Abstract,
 		define: options.base,
 		Data: options.data,
+		clone: options.clone,
 		...able,
 	});
 
 	Object.defineProperty(Base.prototype, 'toJson', {
 		writable: false,
 		value: function toJsonProxy() {
-			return options.toJson(this, Registry.Instance.get(this));
+			return options.toJson(this, Instance.get(this).data);
 		},
 	});
 
@@ -36,4 +39,4 @@ export function define(name, _options) {
 }
 
 export const isBase = any => Registry.Model.has(any);
-export { Registry };
+export { Instance, Options };

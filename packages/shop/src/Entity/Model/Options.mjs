@@ -14,6 +14,7 @@ export const Schema = S.Object({
 	name: NameSchema,
 	super: P.Function(Object),
 	data: P.Function(_data => _data),
+	clone: P.Function(data => Object.assign({}, data)),
 	abstract: P.Function(DefaultClass),
 	base: P.Function(DefaultClass),
 	toJson: P.Function(DefaultToJson),
