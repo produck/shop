@@ -1,3 +1,5 @@
+import { T, U } from '@produck/mold';
+
 import * as Utils from './Utils.mjs';
 import * as Instance from './Instance.mjs';
 
@@ -8,11 +10,9 @@ function ThrowNamespace(name) {
 
 	const ERROR_CLASS_NAME = `${name}ImplementError`;
 
-	const ImplementError = {
-		[ERROR_CLASS_NAME]: class extends Error {
-			name = ERROR_CLASS_NAME;
-		},
-	}[ERROR_CLASS_NAME];
+	const ImplementError = { [ERROR_CLASS_NAME]: class extends Error {
+		name = ERROR_CLASS_NAME;
+	} }[ERROR_CLASS_NAME];
 
 	namespace.ImplementError = (message, cause) => {
 		throw new ImplementError(message, { cause });
@@ -21,15 +21,11 @@ function ThrowNamespace(name) {
 	return Object.freeze(namespace);
 }
 
-function normalizeBase(_Base) {
-	return _Base;
-}
-
 export function BaseModelClass({
 	name, Abstract, define, Data, clone, updatable, deletable, creatable,
 }) {
 	const CLASS_NAME = `Base${name}`;
-	const Throw = ThrowNamespace();
+	const Throw = ThrowNamespace(name);
 
 	const injection = Object.freeze({
 		Throw, Data, clone,
@@ -37,17 +33,17 @@ export function BaseModelClass({
 		NAME: CLASS_NAME,
 	});
 
-	const BaseModel = normalizeBase(define(Abstract, injection));
+	const BaseModel = define(Abstract, injection);
+
+	if (!T.Native.Function(BaseModel)) {
+		U.throwError('BaseModel <= define()', 'function');
+	}
+
+	if (!Object.prototype.isPrototypeOf.call(Abstract, BaseModel)) {
+		U.throwError('BaseModel <= define()', `Class extends ${Abstract.name}`);
+	}
 
 	Utils.fixClassName(BaseModel, CLASS_NAME);
-
-	const ensureDataInResult = (_data, index) => {
-		try {
-			return Data(_data);
-		} catch (cause) {
-			Throw.ImplementError(`Bad ${name} data at ${index} in result.`, cause);
-		}
-	};
 
 	const ensureData = data => {
 		try {
@@ -56,26 +52,6 @@ export function BaseModelClass({
 			Throw.ImplementError(`Bad ${name} data.`, cause);
 		}
 	};
-
-	const ensureCopy = data => {
-		try {
-			return Data(data);
-		} catch (cause) {
-			Throw.ImplementError(`Bad ${name} data copy.`, cause);
-		}
-	};
-
-	Utils.defineValueMember(BaseModel, 'query', async function query(filter) {
-		const _result = await this._query(filter);
-
-		if (!Array.isArray(_result)) {
-			Throw.ImplementError(`Bad ${name} result when query(), one array expected.`);
-		}
-
-		const result = _result.map(ensureDataInResult);
-
-		return result.map(data => new this(data));
-	});
 
 	Utils.defineValueMember(BaseModel, 'has', async function has(_data) {
 		const data = Data(_data);
@@ -104,12 +80,32 @@ export function BaseModelClass({
 			const data = Data(_data);
 
 			if (await this.has(data)) {
-				Throw(`Duplicated ${name}.`);
+				Throw(`Duplicated ${name} data.`);
 			}
 
 			return new this(ensureData(await this._create(data)));
 		});
 	}
+
+	const ensureDataInResult = (_data, index) => {
+		try {
+			return Data(_data);
+		} catch (cause) {
+			Throw.ImplementError(`Bad ${name} data at ${index} in result.`, cause);
+		}
+	};
+
+	Utils.defineValueMember(BaseModel, 'query', async function query(filter) {
+		const _result = await this._query(filter);
+
+		if (!T.Helper.Array(_result)) {
+			Throw.ImplementError(`Bad ${name} result when query(), one array expected.`);
+		}
+
+		const result = _result.map(ensureDataInResult);
+
+		return result.map(data => new this(data));
+	});
 
 	if (deletable) {
 		const callDestroy = model => model.destroy;
@@ -124,6 +120,14 @@ export function BaseModelClass({
 	}
 
 	const { prototype } = BaseModel;
+
+	const ensureCopy = data => {
+		try {
+			return Data(data);
+		} catch (cause) {
+			Throw.ImplementError(`Bad ${name} data copy.`, cause);
+		}
+	};
 
 	Utils.defineValueMember(prototype, 'load', async function load() {
 		const instance = Instance.get(this);

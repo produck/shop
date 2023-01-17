@@ -1,9 +1,10 @@
-import * as Registry from './Registry.mjs';
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
 
 import * as Options from './Options.mjs';
 import * as Instance from './Instance.mjs';
+
+const ModelRegistry = new WeakSet();
 
 export function define(name, _options) {
 	const options = Options.normalize(_options);
@@ -33,10 +34,10 @@ export function define(name, _options) {
 		},
 	});
 
-	Registry.Model.add(Base);
+	ModelRegistry.add(Base);
 
 	return Base;
 }
 
-export const isBase = any => Registry.Model.has(any);
+export const isBase = any => ModelRegistry.has(any);
 export { Instance, Options };
