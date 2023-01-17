@@ -1,17 +1,18 @@
+import { T, U } from '@produck/mold';
 import * as Utils from './Utils.mjs';
 
+class NotImplementedError extends Error {
+	name = 'NotImplementedError';
+}
+
 function assertImplemented(name) {
-	throw new Error(`Member '.${name}()' MUST be implemented.`);
+	throw new NotImplementedError(`Abstract member(${name}) is NOT implemented.`);
 }
 
 function AssertNamespace() {
 	return Object.freeze({
 		Implemented: assertImplemented,
 	});
-}
-
-function normalizeAbstract(_Abstract) {
-	return _Abstract;
 }
 
 export function AbstractModelClass({
@@ -21,7 +22,15 @@ export function AbstractModelClass({
 	const Assert = AssertNamespace();
 	const injection = Object.freeze({ NAME: CLASS_NAME, Assert });
 
-	const AbstractModel = normalizeAbstract(define(Super, injection));
+	const AbstractModel = define(Super, injection);
+
+	if (!T.Native.Function(AbstractModel)) {
+		U.throwError('AbstractModel <= define()', 'function');
+	}
+
+	if (!Object.prototype.isPrototypeOf.call(Super, AbstractModel)) {
+		U.throwError('AbstractModel <= define()', `Class extends ${Super.name}`);
+	}
 
 	function defineAbstractMethod(object, name) {
 		const method = { [name]: function () {
@@ -34,9 +43,7 @@ export function AbstractModelClass({
 	Utils.fixClassName(AbstractModel, CLASS_NAME);
 
 	if (!Object.hasOwn(AbstractModel, '_has')) {
-		Utils.defineValueMember(AbstractModel, '_has', function _has(data) {
-			return this._get(data) !== null;
-		});
+		defineAbstractMethod(AbstractModel, '_has');
 	}
 
 	if (!Object.hasOwn(AbstractModel, '_get')) {

@@ -33,7 +33,7 @@ export function BaseModelClass({
 
 	const injection = Object.freeze({
 		Throw, Data, clone,
-		Instance: model => Instance.get(model),
+		Private: model => Instance.get(model),
 		NAME: CLASS_NAME,
 	});
 
