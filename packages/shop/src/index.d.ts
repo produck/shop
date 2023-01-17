@@ -1,11 +1,5 @@
-interface FilterOptions {
-	unique?: boolean;
-	data?: any;
-	[key: string]: any;
-}
-
 interface Filter {
-	options?: FilterOptions;
+	options?: any;
 	scope?: FilterScope;
 }
 
@@ -15,17 +9,20 @@ interface FilterScope {
 	filter: Filter;
 }
 
+type Data = any | null;
+
 export namespace Abstract {
 	interface Model {
-		_reload(): Promise<any>;
-		_update?(): Promise<void>;
-		_destroy?(): Promise<void>;
+		_load?(data: Data): Promise<Data>;
+		_save?(data: Data): Promise<Data>;
+		_destroy?(data: Data): Promise<Data>;
 	}
 
 	interface ModelConstructor {
-		_create?(data: any): Promise<any>;
-		_query(filter: Filter): Promise<any[]>;
-		_has(filter: Filter): Promise<boolean>;
+		_has(data: Data): Promise<boolean>;
+		_get(data: Data): Promise<Data>;
+		_query(filter: Filter): Promise<Data[]>;
+		_create?(data: Data): Promise<Data>;
 	}
 }
 
@@ -33,18 +30,19 @@ export namespace Base {
 	interface Model extends Abstract.Model {
 		readonly isDirty: boolean;
 		readonly isDestroyed: boolean;
-		reload(): Promise<this>;
-		update?(): Promise<this>;
+		load(): Promise<this>;
+		save?(): Promise<this>;
 		destroy?(): Promise<this>;
 	}
 
 	interface ModelConstructor extends Abstract.ModelConstructor {
 		readonly name: string;
 		readonly symbol: symbol;
-		create?(): Promise<Model>;
+		has(data: Data): Promise<boolean>;
+		get(data: Data): Promise<Model>;
+		create?(data: Data): Promise<Model>;
 		query(filter: Filter): Promise<Model[]>;
-		has(data: any): Promise<boolean>;
-		get(data: any): Promise<Model>;
+		remove?(filter: Filter): Promise<Model[]>;
 	}
 }
 
@@ -54,7 +52,7 @@ export namespace Custom {
 	}
 
 	interface ModelConstructor extends Base.ModelConstructor {
-		new (data: any): Model;
+		new(data: any): Model;
 	}
 }
 
@@ -64,29 +62,25 @@ export namespace Proxy {
 	}
 
 	interface ModelConstructor extends Custom.ModelConstructor {
-		new (data: any): Model;
+		new(data: any): Model;
 	}
 }
 
 interface ModelOptions {
+	name: string,
 	super: Function;
 	data: () => void;
 	abstract: () => Abstract.ModelConstructor;
 	base: () => Base.ModelConstructor;
-	toJson: () => any;
+	toJson: (self: Base.Model, data: any) => any;
 }
 
-export function Model(
-	name: string,
-	options: ModelOptions
-): Base.ModelConstructor;
+export function Model(options: ModelOptions): Base.ModelConstructor;
 
 interface CustomOptions {
-	base: Function,
+	name: string;
+	base: Function;
 	custom: () => Proxy.ModelConstructor;
 }
 
-export function Custom(
-	name: string,
-	options: CustomOptions
-): Proxy.ModelConstructor;
+export function Custom(options: CustomOptions): Proxy.ModelConstructor;

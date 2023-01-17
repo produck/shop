@@ -1,5 +1,5 @@
-import * as Registry from './Registry.mjs';
-import * as Model from './Model.mjs';
+import * as Registry from '../Registry.mjs';
+import * as Model from '../Model/Model.mjs';
 
 function CustomModelClass(name, Base, define) {
 	const CLASS_NAME = `${name}${Base.name}`;

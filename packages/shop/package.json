@@ -27,6 +27,7 @@
 		"url": "git+https://github.com/produck/shop.git"
 	},
 	"scripts": {
+		"test": "mocha \"**/*.spec.mjs\" --no-diff -t 999999999",
 		"build": "rollup -c script/rollup.config.mjs",
 		"prepublishOnly": " npm run build"
 	},
