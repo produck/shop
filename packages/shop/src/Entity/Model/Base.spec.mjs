@@ -4,6 +4,14 @@ import { BaseModelClass } from './Base.mjs';
 import * as D from './Data.mjs';
 
 describe('Shop::Entity::Model::BaseModelClass()', function () {
+	const Abstract = AbstractModelClass(Date, {
+		name: 'Mock',
+		define: (Super) => class extends Super {},
+		updatable: true,
+		deletable: true,
+		creatable: true,
+	});
+
 	const SAMPLE_OPTIONS = {
 		name: 'Mock',
 		define: (Abstract) => class extends Abstract {},
@@ -11,18 +19,10 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 		updatable: true,
 		deletable: true,
 		creatable: true,
-		Abstract: AbstractModelClass({
-			name: 'Mock',
-			Super: Date,
-			define: (Super) => class extends Super {},
-			updatable: true,
-			deletable: true,
-			creatable: true,
-		}),
 	};
 
 	it('should create a BaseModel.', function () {
-		const BaseMock = BaseModelClass(SAMPLE_OPTIONS);
+		const BaseMock = BaseModelClass(Abstract, SAMPLE_OPTIONS);
 
 		assert.equal(BaseMock.name, 'BaseMock');
 
@@ -37,7 +37,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 	});
 
 	it('should create a BaseModel in un-CUD.', function () {
-		const BaseMock = BaseModelClass({
+		const BaseMock = BaseModelClass(Abstract, {
 			...SAMPLE_OPTIONS,
 			creatable: false,
 			updatable: false,
@@ -57,7 +57,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 	});
 
 	it('should not fix if correct name.', function () {
-		const BaseMock = BaseModelClass({
+		const BaseMock = BaseModelClass(Abstract, {
 			...SAMPLE_OPTIONS,
 			define: (Abstract) => class BaseMock extends Abstract {},
 		});
@@ -67,7 +67,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 	it('should throw if bad BaseModel.', function () {
 		assert.throws(() => {
-			BaseModelClass({
+			BaseModelClass(Abstract, {
 				...SAMPLE_OPTIONS,
 				define: () => [],
 			});
@@ -79,7 +79,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 	it('should throw if bad BaseModel.', function () {
 		assert.throws(() => {
-			BaseModelClass({
+			BaseModelClass(Abstract, {
 				...SAMPLE_OPTIONS,
 				define: () => class Foo {},
 			});
@@ -92,7 +92,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 	describe('::BaseModel', function () {
 		describe('::has()', function () {
 			it('should be true.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _has() {
 						return true;
 					}
@@ -102,7 +102,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should be false.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _has() {
 						return false;
 					}
@@ -112,7 +112,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if bad _has().', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _has() {
 						return null;
 					}
@@ -127,7 +127,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 		describe('::get()', function () {
 			it('should get a null.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _get() {
 						return null;
 					}
@@ -139,7 +139,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			it('should be a data.', async function () {
 				const data = { foo: 'bar' };
 
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _get() {
 						return data;
 					}
@@ -149,7 +149,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should be throw if bad data.', async function () {
-				class CustomMock extends BaseModelClass({
+				class CustomMock extends BaseModelClass(Abstract, {
 					...SAMPLE_OPTIONS,
 					Data: (flag) => {
 						if (flag) {
@@ -175,7 +175,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			it('should create a CustomModel.', async function () {
 				const data = { foo: 'bar' };
 
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _has() {
 						return false;
 					}
@@ -189,7 +189,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if duplicated data.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _has() {
 						return true;
 					}
@@ -206,7 +206,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if bad data.', async function () {
-				class CustomMock extends BaseModelClass({
+				class CustomMock extends BaseModelClass(Abstract, {
 					...SAMPLE_OPTIONS,
 					Data: (flag) => {
 						if (flag) {
@@ -234,7 +234,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 		describe('::query()', function () {
 			it('should get a empty [].', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _query() {
 						return [];
 					}
@@ -244,7 +244,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if bad result.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					static async _query() {
 						return null;
 					}
@@ -257,7 +257,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if bad result.', async function () {
-				class CustomMock extends BaseModelClass({
+				class CustomMock extends BaseModelClass(Abstract, {
 					...SAMPLE_OPTIONS,
 					Data: (_data) => {
 						if (_data !== null) {
@@ -281,7 +281,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 		describe('::remove()', function () {
 			it('should remove all in result.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_destroy() {}
 
 					static async _query() {
@@ -297,7 +297,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 		describe('.isDestroyed', function () {
 			it('should be true.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_load() {
 						return null;
 					}
@@ -310,7 +310,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should be false.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_load() {
 						return {};
 					}
@@ -325,7 +325,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 		describe('.load()', function () {
 			it('should refresh model data.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_load() {
 						return { b: 2 };
 					}
@@ -339,7 +339,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should cause model to be destroyed.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_load() {
 						return null;
 					}
@@ -353,7 +353,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if destroyed.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_load() {}
 				}
 
@@ -370,7 +370,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 		describe('.save()', function () {
 			it('should refresh model data.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_save() {
 						return { b: 2 };
 					}
@@ -384,7 +384,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should cause model to be destroyed.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_save() {
 						return null;
 					}
@@ -398,7 +398,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if destroyed.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_save() {}
 				}
 
@@ -415,7 +415,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 
 		describe('.destroy()', function () {
 			it('should refresh model data.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_destroy() {
 
 					}
@@ -429,7 +429,7 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 			});
 
 			it('should throw if destroyed.', async function () {
-				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
 					_destroy() {}
 				}
 

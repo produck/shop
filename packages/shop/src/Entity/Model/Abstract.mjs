@@ -16,8 +16,8 @@ function AssertNamespace() {
 	});
 }
 
-export function AbstractModelClass({
-	name, Super, define, updatable, deletable, creatable,
+export function AbstractModelClass(Super, {
+	name, define, updatable, deletable, creatable,
 }) {
 	const CLASS_NAME = `Abstract${name}`;
 	const Assert = AssertNamespace();

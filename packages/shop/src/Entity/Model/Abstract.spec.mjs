@@ -4,7 +4,6 @@ import { AbstractModelClass } from './Abstract.mjs';
 describe('Shop::Entity::Model::AbstractModelClass()', function () {
 	const SAMPLE_OPTIONS = {
 		name: 'Mock',
-		Super: Date,
 		define: (Super) => class extends Super {},
 		updatable: true,
 		deletable: true,
@@ -12,7 +11,7 @@ describe('Shop::Entity::Model::AbstractModelClass()', function () {
 	};
 
 	it('should create a AbstractModel', function () {
-		const AbstractMock = AbstractModelClass(SAMPLE_OPTIONS);
+		const AbstractMock = AbstractModelClass(Date, SAMPLE_OPTIONS);
 
 		assert.equal(AbstractMock.name, 'AbstractMock');
 
@@ -27,7 +26,7 @@ describe('Shop::Entity::Model::AbstractModelClass()', function () {
 	});
 
 	it('should create a AbstractModel in un-CUD.', function () {
-		const AbstractMock = AbstractModelClass({
+		const AbstractMock = AbstractModelClass(Date, {
 			...SAMPLE_OPTIONS,
 			updatable: false,
 			deletable: false,
@@ -47,7 +46,7 @@ describe('Shop::Entity::Model::AbstractModelClass()', function () {
 	});
 
 	it('should not fix if correct name.', function () {
-		const AbstractMock = AbstractModelClass({
+		const AbstractMock = AbstractModelClass(Date, {
 			...SAMPLE_OPTIONS,
 			define: (Super) => class AbstractMock extends Super {},
 		});
@@ -57,7 +56,7 @@ describe('Shop::Entity::Model::AbstractModelClass()', function () {
 
 	it('should throw if bad AbstractModel.', function () {
 		assert.throws(() => {
-			AbstractModelClass({
+			AbstractModelClass(Date, {
 				...SAMPLE_OPTIONS,
 				define: () => [],
 			});
@@ -69,7 +68,7 @@ describe('Shop::Entity::Model::AbstractModelClass()', function () {
 
 	it('should throw if bad AbstractModel.', function () {
 		assert.throws(() => {
-			AbstractModelClass({
+			AbstractModelClass(Date, {
 				...SAMPLE_OPTIONS,
 				define: () => class AbstractMock {},
 			});
@@ -80,7 +79,7 @@ describe('Shop::Entity::Model::AbstractModelClass()', function () {
 	});
 
 	describe('::AbstractModel', function () {
-		const AbstractMock = AbstractModelClass(SAMPLE_OPTIONS);
+		const AbstractMock = AbstractModelClass(Date, SAMPLE_OPTIONS);
 
 		for (const name of ['_has', '_get', '_query', '_create']) {
 			describe(`::${name}()`, function () {
@@ -105,7 +104,7 @@ describe('Shop::Entity::Model::AbstractModelClass()', function () {
 		}
 
 		it('should custom a abstract member.', async function () {
-			const AbstractMock = AbstractModelClass({
+			const AbstractMock = AbstractModelClass(Date, {
 				...SAMPLE_OPTIONS,
 				define: (Super, { NAME, Assert }) => {
 					return { [NAME]: class extends Super {

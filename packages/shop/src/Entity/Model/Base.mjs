@@ -21,8 +21,8 @@ function ThrowNamespace(name) {
 	return Object.freeze(namespace);
 }
 
-export function BaseModelClass({
-	name, Abstract, define, Data, updatable, deletable, creatable,
+export function BaseModelClass(Abstract, {
+	name, define, Data, updatable, deletable, creatable,
 }) {
 	const CLASS_NAME = `Base${name}`;
 	const Throw = ThrowNamespace(name);
