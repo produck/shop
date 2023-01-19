@@ -1,6 +1,4 @@
 import assert from 'node:assert/strict';
-import { describe } from 'mocha';
-
 import { AbstractModelClass } from './Abstract.mjs';
 
 describe('Shop::Entity::Model::AbstractModelClass()', function () {

@@ -1,6 +1,4 @@
 import assert from 'node:assert/strict';
-import { describe } from 'mocha';
-
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
 import * as D from './Data.mjs';
@@ -10,7 +8,6 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 		name: 'Mock',
 		define: (Abstract) => class extends Abstract {},
 		Data: any => any,
-		clone: data => Object.assign({}, data),
 		updatable: true,
 		deletable: true,
 		creatable: true,

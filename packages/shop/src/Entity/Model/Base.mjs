@@ -82,8 +82,6 @@ export function BaseModelClass({
 		});
 	}
 
-	Utils.defineValueMember(BaseModel, 'modelName', name);
-
 	const ensureDataInResult = (_data, index) => {
 		try {
 			return Data(_data);
