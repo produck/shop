@@ -4,10 +4,10 @@ export const BASE_DESCRIPTOR = {
 	enumerable: false,
 };
 
-export function defineValueMember(object, name, method) {
+export function defineValueMember(object, name, value) {
 	Object.defineProperty(object, name, {
 		...BASE_DESCRIPTOR,
-		value: method,
+		value: value,
 	});
 }
 

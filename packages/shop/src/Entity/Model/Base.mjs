@@ -1,7 +1,7 @@
 import { T, U } from '@produck/mold';
 
 import * as Utils from './Utils.mjs';
-import * as Instance from './Instance.mjs';
+import * as D from './Data.mjs';
 
 function ThrowNamespace(name) {
 	const namespace = function Throw(message, ErrorConstructor = Error) {
@@ -22,16 +22,11 @@ function ThrowNamespace(name) {
 }
 
 export function BaseModelClass({
-	name, Abstract, define, Data, clone, updatable, deletable, creatable,
+	name, Abstract, define, Data, updatable, deletable, creatable,
 }) {
 	const CLASS_NAME = `Base${name}`;
 	const Throw = ThrowNamespace(name);
-
-	const injection = Object.freeze({
-		Throw, Data, clone,
-		Private: model => Instance.get(model),
-		NAME: CLASS_NAME,
-	});
+	const injection = Object.freeze({ Throw, NAME: CLASS_NAME });
 
 	const BaseModel = define(Abstract, injection);
 
@@ -87,6 +82,8 @@ export function BaseModelClass({
 		});
 	}
 
+	Utils.defineValueMember(BaseModel, 'modelName', name);
+
 	const ensureDataInResult = (_data, index) => {
 		try {
 			return Data(_data);
@@ -121,49 +118,48 @@ export function BaseModelClass({
 
 	const { prototype } = BaseModel;
 
-	const ensureCopy = data => {
-		try {
-			return Data(data);
-		} catch (cause) {
-			Throw.ImplementError(`Bad ${name} data copy.`, cause);
-		}
-	};
+	function defineMethod(methodName, method) {
+		const proxy = { [methodName]: function (...args) {
+			if (this.isDestroyed) {
+				Throw(`The ${name} instance is destroyed.`);
+			}
 
-	Utils.defineValueMember(prototype, 'load', async function load() {
-		const instance = Instance.get(this);
-		const copy = ensureCopy(clone(instance.data));
-		const data = ensureData(await this._load(copy));
+			return method.call(this, ...args);
+		} }[methodName];
 
-		instance.data = data;
+		Utils.defineValueMember(prototype, methodName, proxy);
+	}
+
+	Object.defineProperty(prototype, 'isDestroyed', {
+		get: function isDestroyed() {
+			return D._(this) === null;
+		},
+	});
+
+	defineMethod('load', async function () {
+		const _data = await this._load(D._(this));
+		const data = _data === null ? null : ensureData(_data);
+
+		D.set(this, data);
 
 		return this;
 	});
 
-	Object.defineProperty(prototype, 'isDestroyed', {
-		get: function isDestroyed() {
-			return Instance.get(this).data === null;
-		},
-	});
-
 	if (updatable) {
-		Utils.defineValueMember(prototype, 'save', async function save() {
-			const instance = Instance.get(this);
-			const copy = ensureCopy(clone(instance.data));
-			const data = ensureData(await this._save(copy));
+		defineMethod('save', async function () {
+			const _data = await this._save(D._(this));
+			const data = _data === null ? null : ensureData(_data);
 
-			instance.data = data;
+			D.set(this, data);
 
 			return this;
 		});
 	}
 
 	if (deletable) {
-		Utils.defineValueMember(prototype, 'destroy', async function destroy() {
-			const instance = Instance.get(this);
-			const copy = ensureCopy(clone(instance.data));
-
-			await this._destroy(copy);
-			instance.data = null;
+		defineMethod('destroy', async function () {
+			await this._destroy(D._(this));
+			D.set(this, null);
 
 			return this;
 		});

@@ -1,8 +1,6 @@
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
-
 import * as Options from './Options.mjs';
-import * as Instance from './Instance.mjs';
 
 const ModelRegistry = new WeakSet();
 
@@ -30,7 +28,7 @@ export function define(name, _options) {
 	Object.defineProperty(Base.prototype, 'toJson', {
 		writable: false,
 		value: function toJsonProxy() {
-			return options.toJson(this, Instance.get(this).data);
+			return options.toJson(this);
 		},
 	});
 
@@ -40,4 +38,4 @@ export function define(name, _options) {
 }
 
 export const isBase = any => ModelRegistry.has(any);
-export { Instance, Options };
+export { Options };

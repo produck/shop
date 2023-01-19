@@ -20,10 +20,12 @@ function ProxyModelClass(name, Custom) {
 			Registry.Data.set(this, data);
 		}
 
-		async query(filter) {
-			super.query(filter);
+		get isDestroyed() {
+
 		}
 	} }[CLASS_NAME];
+
+	Object.freeze(Proxy.prototype);
 
 	return Object.freeze(Proxy);
 }

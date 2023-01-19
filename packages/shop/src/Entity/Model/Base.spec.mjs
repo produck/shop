@@ -3,8 +3,7 @@ import { describe } from 'mocha';
 
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
-
-import * as Model from './index.mjs';
+import * as D from './Data.mjs';
 
 describe('Shop::Entity::Model::BaseModelClass()', function () {
 	const SAMPLE_OPTIONS = {
@@ -300,19 +299,152 @@ describe('Shop::Entity::Model::BaseModelClass()', function () {
 		});
 
 		describe('.isDestroyed', function () {
+			it('should be true.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_load() {
+						return null;
+					}
+				}
 
+				const mock = new CustomMock({ b: 1 });
+
+				await mock.load();
+				assert.equal(mock.isDestroyed, true);
+			});
+
+			it('should be false.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_load() {
+						return {};
+					}
+				}
+
+				const mock = new CustomMock({ b: 1 });
+
+				await mock.load();
+				assert.equal(mock.isDestroyed, false);
+			});
 		});
 
 		describe('.load()', function () {
+			it('should refresh model data.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_load() {
+						return { b: 2 };
+					}
+				}
 
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, { b: 1 });
+				await mock.load();
+				assert.deepEqual(D._(mock), { b: 2 });
+			});
+
+			it('should cause model to be destroyed.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_load() {
+						return null;
+					}
+				}
+
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, { b: 1 });
+				await mock.load();
+				assert.equal(mock.isDestroyed, true);
+			});
+
+			it('should throw if destroyed.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_load() {}
+				}
+
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, null);
+
+				await assert.rejects(async () => await mock.load(), {
+					name: 'Error',
+					message: 'The Mock instance is destroyed.',
+				});
+			});
 		});
 
 		describe('.save()', function () {
+			it('should refresh model data.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_save() {
+						return { b: 2 };
+					}
+				}
 
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, { b: 1 });
+				await mock.save();
+				assert.deepEqual(D._(mock), { b: 2 });
+			});
+
+			it('should cause model to be destroyed.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_save() {
+						return null;
+					}
+				}
+
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, { b: 1 });
+				await mock.save();
+				assert.equal(mock.isDestroyed, true);
+			});
+
+			it('should throw if destroyed.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_save() {}
+				}
+
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, null);
+
+				await assert.rejects(async () => await mock.save(), {
+					name: 'Error',
+					message: 'The Mock instance is destroyed.',
+				});
+			});
 		});
 
 		describe('.destroy()', function () {
+			it('should refresh model data.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_destroy() {
 
+					}
+				}
+
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, { b: 1 });
+				await mock.destroy();
+				assert.equal(mock.isDestroyed, true);
+			});
+
+			it('should throw if destroyed.', async function () {
+				class CustomMock extends BaseModelClass(SAMPLE_OPTIONS) {
+					_destroy() {}
+				}
+
+				const mock = new CustomMock({ b: 1 });
+
+				D.set(mock, null);
+
+				await assert.rejects(async () => await mock.destroy(), {
+					name: 'Error',
+					message: 'The Mock instance is destroyed.',
+				});
+			});
 		});
 	});
 });
