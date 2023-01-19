@@ -2,8 +2,8 @@ import { Normalizer, P, S } from '@produck/mold';
 
 const NameSchema = P.StringPattern(/^[0-9A-Z][0-9a-zA-Z]*$/)();
 
-function DefaultClass(Super, { CLASS_NAME }) {
-	return { [CLASS_NAME]: class extends Super {} }[CLASS_NAME];
+function DefaultClass(Super, { NAME }) {
+	return { [NAME]: class extends Super {} }[NAME];
 }
 
 function DefaultToJson() {
