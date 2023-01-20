@@ -1,5 +1,6 @@
 import { T, U } from '@produck/mold';
-import * as Model from './Model/index.mjs';
+import * as Model from '../Model/index.mjs';
+import * as Utils from '../Utils.mjs';
 
 export function CustomModelClass(name, BaseModel, define) {
 	const CLASS_NAME = `${name}${Model.getModelName(BaseModel)}`;
@@ -13,7 +14,7 @@ export function CustomModelClass(name, BaseModel, define) {
 		U.throwError('CustomModel <= define()', `Class extends ${BaseModel.name}`);
 	}
 
-	Model.Utils.defineValueMember(CustomModel, 'name', CLASS_NAME);
+	Utils.defineValueMember(CustomModel, 'name', CLASS_NAME);
 
 	return CustomModel;
 }

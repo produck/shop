@@ -1,6 +1,6 @@
 import { T, U } from '@produck/mold';
 
-import * as Utils from './Utils.mjs';
+import * as Utils from '../Utils.mjs';
 import * as D from './Data.mjs';
 
 function ThrowNamespace(name) {

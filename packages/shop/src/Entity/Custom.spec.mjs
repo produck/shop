@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import * as Model from './Model/index.mjs';
+import * as Model from '../Model/index.mjs';
 import { CustomModelClass } from './Custom.mjs';
 
 describe('Shop::Entity::CustomModelClass()', function () {

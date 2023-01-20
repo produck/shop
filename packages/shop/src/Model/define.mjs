@@ -3,7 +3,7 @@ import { U } from '@produck/mold';
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
 import * as Options from './Options.mjs';
-import * as Utils from './Utils.mjs';
+import * as Utils from '../Utils.mjs';
 
 const ModelRegistry = new WeakMap();
 

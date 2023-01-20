@@ -1,6 +1,6 @@
 import { T, U } from '@produck/mold';
 
-import * as Utils from './Utils.mjs';
+import * as Utils from '../Utils.mjs';
 
 class NotImplementedError extends Error {
 	name = 'NotImplementedError';
