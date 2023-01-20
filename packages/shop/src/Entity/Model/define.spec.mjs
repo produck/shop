@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { defineModel, isModel } from './define.mjs';
+import { defineModel, isModel, getModelName } from './define.mjs';
 
 describe('Shop::Entity::Model', function () {
 	describe('::defineModel()', function () {
@@ -27,6 +27,23 @@ describe('Shop::Entity::Model', function () {
 
 		it('should be false.', function () {
 			assert.equal(isModel(class A {}), false);
+		});
+	});
+
+	describe('::getModelName()', function () {
+		it('should get a name of a model.', function () {
+			const BaseMock = defineModel({ name: 'Mock' });
+
+			assert.equal(getModelName(BaseMock), 'Mock');
+		});
+
+		it('should throw if bad model.', function () {
+			assert.throws(() => {
+				getModelName(class {});
+			}, {
+				name: 'TypeError',
+				message: 'Invalid "model", one "Model" expected.',
+			});
 		});
 	});
 });

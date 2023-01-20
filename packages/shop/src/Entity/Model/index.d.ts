@@ -85,27 +85,14 @@ export function defineModel<
 	_options: Options.Object<S, A, B, DA, DB>
 ): B;
 
+export module Data {
 
-interface ABC {
-	b: boolean;
 }
 
+export module Options {
 
-interface ABCConstructor<
-	CustomSuperConstructor extends Constructor
-> {
-	new (): ABC & InstanceType<CustomSuperConstructor>;
-	a: string;
 }
 
-export function define<
-	CustomSuperConstructor extends Constructor
->(
-	options: Opts<CustomSuperConstructor>
-): ABCConstructor<typeof options.Super> & CustomSuperConstructor;
-
-interface Opts<
-	CustomSuperConstructor extends Constructor
-> {
-	Super: CustomSuperConstructor
-}
+export { defineModel as define };
+export function isModel(model: any): boolean;
+export function getModelName(model: any): string;

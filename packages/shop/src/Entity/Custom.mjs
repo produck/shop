@@ -1,67 +1,19 @@
-import * as Registry from '../Registry.mjs';
-import * as Model from '../Model/Model.mjs';
+import { T, U } from '@produck/mold';
+import * as Model from './Model/index.mjs';
 
-function CustomModelClass(name, Base, define) {
-	const CLASS_NAME = `${name}${Base.name}`;
+export function CustomModelClass(name, BaseModel, define) {
+	const CLASS_NAME = `${name}${Model.getModelName(BaseModel)}`;
+	const CustomModel = define(BaseModel, { NAME: CLASS_NAME });
 
-	const Custom = define(Base, {
-		CLASS_NAME,
-	});
-
-	return Custom;
-}
-
-function ProxyModelClass(name, Custom) {
-	const CLASS_NAME = `${name}${Custom.name}Proxy`;
-
-	const Proxy = { [CLASS_NAME]: class extends Custom {
-		constructor(data) {
-			super(data);
-			Registry.Data.set(this, data);
-		}
-
-		get isDestroyed() {
-
-		}
-	} }[CLASS_NAME];
-
-	Object.freeze(Proxy.prototype);
-
-	return Object.freeze(Proxy);
-}
-
-class CustomModelProxyPrivateMember {
-	#CustomModelProxy = null;
-	#association = new Map();
-
-	constructor(CustomModelProxy) {
-		this.#CustomModelProxy = CustomModelProxy;
+	if (!T.Native.Function(CustomModel)) {
+		U.throwError('CustomModel <= define()', 'function');
 	}
 
-	To(target, as) {
-		const table = this.#association.has(target)
-			? this.#association.get(target)
-			: this.#association.set(target, {}).get(target);
-
-		if (Object.hasOwn(table, as)) {
-			throw new Error();
-		}
-
-		table[as] = true;
-	}
-}
-
-export function define(name, _options) {
-	if (!Model.isBase(options.Base)) {
-		throw new Error();
+	if (!Object.prototype.isPrototypeOf.call(BaseModel, CustomModel)) {
+		U.throwError('CustomModel <= define()', `Class extends ${BaseModel.name}`);
 	}
 
-	const Custom = CustomModelClass(name, options.Base, options.custom);
-	const Proxy = ProxyModelClass(name, Custom);
+	Model.Utils.defineValueMember(CustomModel, 'name', CLASS_NAME);
 
-	Registry.Custom.set(Proxy, new CustomModelProxyPrivateMember(Proxy));
-
-	return Proxy;
+	return CustomModel;
 }
-
-export const is = any => Registry.Custom.has(any);

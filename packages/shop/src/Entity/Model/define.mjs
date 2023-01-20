@@ -1,3 +1,5 @@
+import { U } from '@produck/mold';
+
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
 import * as Options from './Options.mjs';
@@ -22,3 +24,11 @@ export function defineModel(_options) {
 }
 
 export const isModel = any => ModelRegistry.has(any);
+
+export const getModelName = model => {
+	if (!isModel(model)) {
+		U.throwError('model', 'Model');
+	}
+
+	return ModelRegistry.get(model).name;
+};
