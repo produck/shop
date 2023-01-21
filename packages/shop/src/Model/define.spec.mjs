@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
+import { describe, it } from 'mocha';
+
 import { defineModel, isModel, getModelName } from './define.mjs';
 
-describe('Shop::Entity::Model', function () {
+describe('Shop::Model', function () {
 	describe('::defineModel()', function () {
 		it('should create a BaseModel.', function () {
 			const BaseMock = defineModel({ name: 'Mock' });

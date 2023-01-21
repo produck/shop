@@ -1,7 +1,7 @@
-import * as Model from './Model/index.mjs';
+import * as Model from '../Model/index.mjs';
 
-export function ProxyModelClass(name, Custom) {
-	const CLASS_NAME = `${name}${Custom.name}Proxy`;
+export function ProxyModelClass(Custom) {
+	const CLASS_NAME = `${Custom.name}Proxy`;
 
 	const Proxy = { [CLASS_NAME]: class extends Custom {
 		constructor(data) {

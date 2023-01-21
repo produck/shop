@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
+import { describe, it } from 'mocha';
+
 import { AbstractModelClass } from './Abstract.mjs';
 
-describe('Shop::Entity::Model::AbstractModelClass()', function () {
+describe('Shop::Model::AbstractModelClass()', function () {
 	const SAMPLE_OPTIONS = {
 		name: 'Mock',
 		define: (Super) => class extends Super {},

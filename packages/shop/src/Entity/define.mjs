@@ -1,26 +1,15 @@
-import { T, U } from '@produck/mold';
-import * as Model from './Model/index.mjs';
-
+import * as Options from './Options.mjs';
 import { CustomModelClass } from './Custom.mjs';
 import { ProxyModelClass } from './Proxy.mjs';
 
 const EntityRegistry = new WeakMap();
 
-export function defineEntity(name, ModelClass, define) {
-	if (!T.Native.String(name)) {
-		U.throwError('name', 'string');
-	}
+export function defineEntity(_options) {
+	const options = Options.normalize(_options);
+	const { name, Model, define } = options;
 
-	if (!Model.isModel(ModelClass)) {
-		U.throwError('ModelClass', 'Class <= Model.define()');
-	}
-
-	if (!T.Native.Function(define)) {
-		U.throwError('define', 'function');
-	}
-
-	const Custom = CustomModelClass(name, ModelClass, define);
-	const Proxy = ProxyModelClass(name, Custom);
+	const Custom = CustomModelClass(name, Model, define);
+	const Proxy = ProxyModelClass(Custom);
 
 	EntityRegistry.set(Proxy, {});
 
