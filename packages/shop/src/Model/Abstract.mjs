@@ -19,11 +19,21 @@ function AssertNamespace() {
 export function AbstractModelClass(Super, {
 	name, define, updatable, deletable, creatable,
 }) {
+	function defineAbstractMethod(object, name) {
+		const method = { [name]: function () {
+			Assert.Implemented(name);
+		} }[name];
+
+		Utils.defineValueMember(object, name, method);
+	}
+
 	const CLASS_NAME = `Abstract${name}`;
 	const Assert = AssertNamespace();
-	const injection = Object.freeze({ NAME: CLASS_NAME, Assert });
 
-	const AbstractModel = define(Super, injection);
+	const AbstractModel = define(Super, {
+		Assert, defineAbstractMethod,
+		NAME: CLASS_NAME,
+	});
 
 	if (!T.Native.Function(AbstractModel)) {
 		U.throwError('AbstractModel <= define()', 'function');
@@ -31,14 +41,6 @@ export function AbstractModelClass(Super, {
 
 	if (!Object.prototype.isPrototypeOf.call(Super, AbstractModel)) {
 		U.throwError('AbstractModel <= define()', `Class extends ${Super.name}`);
-	}
-
-	function defineAbstractMethod(object, name) {
-		const method = { [name]: function () {
-			Assert.Implemented(name);
-		} }[name];
-
-		Utils.defineValueMember(object, name, method);
 	}
 
 	Utils.fixClassName(AbstractModel, CLASS_NAME);

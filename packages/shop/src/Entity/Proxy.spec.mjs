@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'mocha';
 
 import * as Model from '../Model/index.mjs';
+import * as Data from '../Data.mjs';
 import { CustomModelClass } from './Custom.mjs';
 import { ProxyModelClass } from './Proxy.mjs';
 
@@ -23,7 +24,7 @@ describe('Shop::Entity::ProxyModelClass()', function () {
 			const FileMockProxy = ProxyModelClass(CustomMock);
 			const mock = new FileMockProxy({ foo: 'bar' });
 
-			assert.deepEqual(Model.Data._(mock), { foo: 'bar' });
+			assert.deepEqual(Data._(mock), { foo: 'bar' });
 		});
 	});
 });

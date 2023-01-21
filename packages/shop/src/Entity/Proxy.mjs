@@ -1,4 +1,4 @@
-import * as Model from '../Model/index.mjs';
+import * as Data from '../Data.mjs';
 
 export function ProxyModelClass(Custom) {
 	const CLASS_NAME = `${Custom.name}Proxy`;
@@ -6,7 +6,7 @@ export function ProxyModelClass(Custom) {
 	const Proxy = { [CLASS_NAME]: class extends Custom {
 		constructor(data) {
 			super(data);
-			Model.Data.set(this, data);
+			Data.set(this, data);
 		}
 	} }[CLASS_NAME];
 

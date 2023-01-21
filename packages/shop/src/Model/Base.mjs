@@ -1,7 +1,7 @@
 import { T, U } from '@produck/mold';
 
 import * as Utils from '../Utils.mjs';
-import * as D from './Data.mjs';
+import * as D from '../Data.mjs';
 
 function ThrowNamespace(name) {
 	const namespace = function Throw(message, ErrorConstructor = Error) {
@@ -26,9 +26,8 @@ export function BaseModelClass(Abstract, {
 }) {
 	const CLASS_NAME = `Base${name}`;
 	const Throw = ThrowNamespace(name);
-	const injection = Object.freeze({ Throw, NAME: CLASS_NAME });
 
-	const BaseModel = define(Abstract, injection);
+	const BaseModel = define(Abstract, { Throw, NAME: CLASS_NAME });
 
 	if (!T.Native.Function(BaseModel)) {
 		U.throwError('BaseModel <= define()', 'function');

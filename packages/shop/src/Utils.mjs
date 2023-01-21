@@ -1,6 +1,5 @@
 export const BASE_DESCRIPTOR = {
 	configurable: false,
-	writable: false,
 	enumerable: false,
 };
 

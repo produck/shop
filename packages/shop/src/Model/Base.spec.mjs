@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 
 import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
-import * as D from './Data.mjs';
+import * as D from '../Data.mjs';
 
 describe('Shop::Model::BaseModelClass()', function () {
 	const Abstract = AbstractModelClass(Date, {
