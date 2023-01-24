@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 
 import { defineModel, isModel, getModelName } from './define.mjs';
 
-describe('Shop::Model', function () {
+describe('::Model', function () {
 	describe('::defineModel()', function () {
 		it('should create a BaseModel.', function () {
 			const BaseMock = defineModel({ name: 'Mock' });

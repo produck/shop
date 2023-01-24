@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 import * as Model from '../Model/index.mjs';
 import { CustomModelClass } from './Custom.mjs';
 
-describe('Shop::Entity::CustomModelClass()', function () {
+describe('::Entity::CustomModelClass()', function () {
 	const Mock = Model.define({
 		name: 'Mock',
 	});

@@ -6,7 +6,7 @@ import * as Data from '../Data.mjs';
 import { CustomModelClass } from './Custom.mjs';
 import { ProxyModelClass } from './Proxy.mjs';
 
-describe('Shop::Entity::ProxyModelClass()', function () {
+describe('::Entity::ProxyModelClass()', function () {
 	const BaseMock = Model.define({ name: 'Mock' });
 
 	const CustomMock = CustomModelClass('File', BaseMock, (Base) => {

@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 import * as Model from '../Model/index.mjs';
 import { defineEntity, isEntity } from './define.mjs';
 
-describe('Shop::Entity::define()', function () {
+describe('::Entity::define()', function () {
 	const BaseMock = Model.define({ name: 'Mock' });
 
 	const SAMPLE = {

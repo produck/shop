@@ -5,7 +5,7 @@ import { AbstractModelClass } from './Abstract.mjs';
 import { BaseModelClass } from './Base.mjs';
 import * as D from '../Data.mjs';
 
-describe('Shop::Model::BaseModelClass()', function () {
+describe('::Model::BaseModelClass()', function () {
 	const Abstract = AbstractModelClass(Date, {
 		name: 'Mock',
 		define: (Super) => class extends Super {},

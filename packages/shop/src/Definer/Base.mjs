@@ -54,7 +54,6 @@ class Declarator {
 	}
 
 	#UnsafeMethod(name, fn) {
-
 		this.Value(name, fn);
 	}
 
@@ -100,13 +99,22 @@ class Declarator {
 	}
 }
 
-export function BaseDefiner(factory) {
-	if (!T.Native.Function(factory)) {
-		U.throwError('factory', 'function');
-	}
+export function BaseDefiner(factory = () => {}, _constructor = () => []) {
+	assertFunctionArg(factory, 'factory');
+	assertFunctionArg(_constructor, '_constructor');
 
 	return function defineBase(Abstract, { NAME, Throw }) {
-		const BaseModel = { [NAME]: class extends Abstract {} }[NAME];
+		const BaseModel = { [NAME]: class extends Abstract {
+			constructor(data) {
+				const args = _constructor(data);
+
+				if (!T.Helper.Array(args)) {
+					U.throwError('args <= _constructor()', 'array');
+				}
+
+				super(...args);
+			}
+		} }[NAME];
 
 		const Declare = {
 			Prototype: new Declarator(BaseModel.prototype),
