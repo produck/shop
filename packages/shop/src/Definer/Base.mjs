@@ -1,54 +1,119 @@
-import { Normalizer, P, PROPERTY, S, T, U } from '@produck/mold';
+import { T, U } from '@produck/mold';
 
 import * as Utils from '../Utils.mjs';
 
-const FieldSchema = S.Object({
-	accessor: S.Object({
-		[PROPERTY]: S.Object({
-			get: P.OrNull(P.Function()),
-			set: P.OrNull(P.Function()),
-		}),
-	}),
-	values: S.Object({ [PROPERTY]: P.Any() }),
-});
+function wrap(fn) {
+	return function (...args) {
+		if (this.isDestroyed) {
+			throw new Error('The model instance has been destroyed.');
+		}
 
-const Schema = S.Object({
-	prototype: FieldSchema,
-	constructor: FieldSchema,
-});
+		return fn.call(this, ...args);
+	};
+}
 
-const normalize = Normalizer(Schema);
-
-function defineMember(target, options) {
-	const { accessor, values } = options;
-
-	for (const name in values) {
-		Utils.defineValueMember(target, name, values[name]);
-	}
-
-	for (const name in accessor) {
-		const { get, set } = accessor[name];
-
-		Object.defineProperty(target, name, {
-			get: get === null ? undefined : get,
-			set: set === null ? undefined : set,
-		});
+function assertMemberName(any) {
+	if (!T.Native.String(any)) {
+		U.throwError('name', 'string');
 	}
 }
 
-export function BaseDefiner(provide) {
-	if (!T.Native.Function(provide)) {
-		U.throwError('provide', 'function');
+function assertFunctionArg(any, role) {
+	if (!T.Native.Function(any)) {
+		U.throwError(role, 'function');
+	}
+}
+
+class Declarator {
+	#target = null;
+	#notDestroyedRequired = false;
+
+	constructor(target) {
+		this.#target = target;
+	}
+
+	notDestroyedRequired(flag = true) {
+		if (!T.Native.Boolean(flag)) {
+			U.throwError('flag', 'boolean');
+		}
+
+		this.#notDestroyedRequired = flag;
+
+		return this;
+	}
+
+	Value(name, any) {
+		assertMemberName(name);
+		Utils.defineValueMember(this.#target, name, any);
+
+		return this;
+	}
+
+	#SafeMethod(name, fn) {
+		this.Value(name, wrap(fn));
+	}
+
+	#UnsafeMethod(name, fn) {
+
+		this.Value(name, fn);
+	}
+
+	Method(name, fn) {
+		assertMemberName(name);
+		assertFunctionArg(fn, 'fn');
+
+		if (this.#notDestroyedRequired) {
+			this.#SafeMethod(name, fn);
+		} else {
+			this.#UnsafeMethod(name, fn);
+		}
+
+		return this;
+	}
+
+	#SafeAccessor(name, getter, setter) {
+		Object.defineProperty(this.#target, name, {
+			get: wrap(getter),
+			set: wrap(setter),
+		});
+	}
+
+	#UnsafeAccessor(name, getter, setter) {
+		Object.defineProperty(this.#target, name, {
+			get: getter,
+			set: setter,
+		});
+	}
+
+	Accessor(name, getter, setter = () => {}) {
+		assertMemberName(name);
+		assertFunctionArg(getter, 'getter');
+		assertFunctionArg(setter, 'setter');
+
+		if (this.#notDestroyedRequired) {
+			this.#SafeAccessor(name, getter, setter);
+		} else {
+			this.#UnsafeAccessor(name, getter, setter);
+		}
+
+		return this;
+	}
+}
+
+export function BaseDefiner(factory) {
+	if (!T.Native.Function(factory)) {
+		U.throwError('factory', 'function');
 	}
 
 	return function defineBase(Abstract, { NAME, Throw }) {
-		const _options = provide(Throw);
-		const { prototype, constructor } = normalize(_options);
-
 		const BaseModel = { [NAME]: class extends Abstract {} }[NAME];
 
-		defineMember(BaseModel.prototype, prototype);
-		defineMember(BaseModel, constructor);
+		const Declare = {
+			Prototype: new Declarator(BaseModel.prototype),
+			Constructor: new Declarator(BaseModel),
+		};
+
+		factory({ Throw, Declare });
 
 		return BaseModel;
 	};
