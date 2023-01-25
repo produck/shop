@@ -26,11 +26,49 @@ function assertFunctionArg(any, role) {
 
 class Declarator {
 	#target = null;
-	#notDestroyedRequired = false;
 
 	constructor(target) {
 		this.#target = target;
 	}
+
+	Value(name, any) {
+		assertMemberName(name);
+		Utils.defineValueMember(this.#target, name, any);
+
+		return this;
+	}
+
+	_Method(name, fn) {
+		this.Value(name, fn);
+	}
+
+	Method(name, fn) {
+		assertMemberName(name);
+		assertFunctionArg(fn, 'fn');
+		this._Method(name, fn);
+
+		return this;
+	}
+
+	_Accessor(name, getter, setter) {
+		Object.defineProperty(this.#target, name, {
+			get: getter,
+			set: setter,
+		});
+	}
+
+	Accessor(name, getter, setter = () => {}) {
+		assertMemberName(name);
+		assertFunctionArg(getter, 'getter');
+		assertFunctionArg(setter, 'setter');
+		this._Accessor(name, getter, setter);
+
+		return this;
+	}
+}
+
+class PrototypeDeclarator extends Declarator {
+	#notDestroyedRequired = false;
 
 	notDestroyedRequired(flag = true) {
 		if (!T.Native.Boolean(flag)) {
@@ -42,60 +80,16 @@ class Declarator {
 		return this;
 	}
 
-	Value(name, any) {
-		assertMemberName(name);
-		Utils.defineValueMember(this.#target, name, any);
-
-		return this;
+	_Method(name, fn) {
+		return super._Method(name, this.#notDestroyedRequired ? wrap(fn) : fn);
 	}
 
-	#SafeMethod(name, fn) {
-		this.Value(name, wrap(fn));
-	}
+	_Accessor(name, getter, setter) {
+		const final = this.#notDestroyedRequired
+			? [wrap(getter), wrap(setter)]
+			: [getter, setter];
 
-	#UnsafeMethod(name, fn) {
-		this.Value(name, fn);
-	}
-
-	Method(name, fn) {
-		assertMemberName(name);
-		assertFunctionArg(fn, 'fn');
-
-		if (this.#notDestroyedRequired) {
-			this.#SafeMethod(name, fn);
-		} else {
-			this.#UnsafeMethod(name, fn);
-		}
-
-		return this;
-	}
-
-	#SafeAccessor(name, getter, setter) {
-		Object.defineProperty(this.#target, name, {
-			get: wrap(getter),
-			set: wrap(setter),
-		});
-	}
-
-	#UnsafeAccessor(name, getter, setter) {
-		Object.defineProperty(this.#target, name, {
-			get: getter,
-			set: setter,
-		});
-	}
-
-	Accessor(name, getter, setter = () => {}) {
-		assertMemberName(name);
-		assertFunctionArg(getter, 'getter');
-		assertFunctionArg(setter, 'setter');
-
-		if (this.#notDestroyedRequired) {
-			this.#SafeAccessor(name, getter, setter);
-		} else {
-			this.#UnsafeAccessor(name, getter, setter);
-		}
-
-		return this;
+		return super._Accessor(name, ...final);
 	}
 }
 
@@ -117,7 +111,7 @@ export function BaseDefiner(factory = () => {}, _constructor = () => []) {
 		} }[NAME];
 
 		const Declare = {
-			Prototype: new Declarator(BaseModel.prototype),
+			Prototype: new PrototypeDeclarator(BaseModel.prototype),
 			Constructor: new Declarator(BaseModel),
 		};
 

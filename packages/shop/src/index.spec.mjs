@@ -34,6 +34,8 @@ it('Shop::Examples', async function () {
 						return this._bar(9, Shop._(this).length);
 					})
 					.Accessor('qux', () => 123);
+
+				assert.equal(Declare.Constructor.notDestroyedRequired, undefined);
 			}, data => [data.length]),
 			toJSON() {
 				return {

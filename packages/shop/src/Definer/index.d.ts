@@ -13,16 +13,19 @@ declare module AbstractModule {
 }
 
 declare module BaseModule {
-	interface Decalrator {
-		notDestroyedRequired(flag: boolean): this;
+	interface Declarator {
 		Value(name: string, any: any): this;
 		Method(name: string, fn: Function): this;
 		Accessor(name: string, getter: Function, setter?: Function): this;
 	}
 
+	interface PrototypeDeclarator extends Declarator {
+		notDestroyedRequired(flag: boolean): this;
+	}
+
 	interface DeclareNamespace {
-		Prototype: Decalrator;
-		Constructor: Decalrator;
+		Prototype: PrototypeDeclarator;
+		Constructor: Declarator;
 	}
 
 	interface Context {
