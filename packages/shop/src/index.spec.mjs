@@ -25,6 +25,8 @@ it('Shop::Examples', async function () {
 				_baz: () => { flags.baz = true; },
 			}),
 			base: Shop.Definer.Base(({ Declare, Throw }) => {
+				Throw;
+
 				Declare.Prototype
 					.Method('foo', function () {
 						flags.base;
