@@ -1,7 +1,5 @@
 export function defineValueMember(object, name, value) {
-	Object.defineProperty(object, name, {
-		value: value,
-	});
+	Object.defineProperty(object, name, { value });
 }
 
 export const fixClassName = (Class, expectedName) => {

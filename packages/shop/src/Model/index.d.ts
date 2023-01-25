@@ -3,9 +3,9 @@ import { Schema } from '@produck/mold';
 type Data = any | null;
 type Filter = any;
 
-type Constructor = abstract new (...args: any) => any
+export type Constructor = abstract new (...args: any) => any
 
-declare namespace Abstract {
+export namespace Abstract {
 	interface Model {
 		_load?(data: Data): Promise<Data>;
 		_save?(data: Data): Promise<Data>;
@@ -13,7 +13,7 @@ declare namespace Abstract {
 	}
 
 	interface ModelConstructor<
-		Super extends Constructor
+		Super extends Constructor = ObjectConstructor
 	> {
 		new(): Model & InstanceType<Super>;
 		_has(data: Data): Promise<boolean>;
@@ -25,9 +25,19 @@ declare namespace Abstract {
 	type CombinedModelConstructor<
 		S extends Constructor
 	> = ModelConstructor<S> & S;
+
+	interface AssertNamespace {
+		Implemented(name: string): void;
+	}
+
+	interface Context {
+		NAME: string;
+		Assert: AssertNamespace;
+		defineAbstractMethod: (object: object, name: string) => void;
+	}
 }
 
-declare namespace Base {
+export namespace Base {
 	interface Model {
 		readonly isDirty: boolean;
 		readonly isDestroyed: boolean;
@@ -41,7 +51,7 @@ declare namespace Base {
 	}
 
 	interface ModelConstructor<
-		Super extends Constructor
+		Super extends Constructor = Abstract.ModelConstructor
 	> {
 		new(): Model & InstanceType<Super>;
 		readonly name: string;
@@ -56,15 +66,28 @@ declare namespace Base {
 	type CombinedModelConstructor<
 		S extends Constructor
 	> = ModelConstructor<S> & S;
+
+	interface ThrowNamespace {
+		(message: string, ErrorConstructor?: ErrorConstructor): void;
+		ImplementError(message: string, cause?: any): void;
+	}
+
+	interface Context {
+		NAME: string;
+		Throw: ThrowNamespace;
+	}
 }
+
+export type AbstractDefiner<S, A> = (Super: S, context: Abstract.Context) => A;
+export type BaseDefiner<A, B> = (Abstract: A, context: Base.Context) => B;
 
 export module Options {
 	interface Object<
 		S extends Constructor = Constructor,
 		A extends Constructor = Constructor,
 		B extends Constructor = Constructor,
-		AD extends (Super: S) => A = () => A,
-		BD extends (Abstract: A) => B = () => B,
+		AD extends AbstractDefiner<S, A> = () => A,
+		BD extends BaseDefiner<A, B> = () => B,
 	> {
 		name: string;
 		Super: S;
