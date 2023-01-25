@@ -1,3 +1,5 @@
+import { Schema } from '@produck/mold';
+
 type Data = any | null;
 type Filter = any;
 
@@ -13,7 +15,7 @@ declare namespace Abstract {
 	interface ModelConstructor<
 		Super extends Constructor
 	> {
-		new (): Model & InstanceType<Super>;
+		new(): Model & InstanceType<Super>;
 		_has(data: Data): Promise<boolean>;
 		_get(data: Data): Promise<Data>;
 		_query(filter: any): Promise<Data[]>;
@@ -41,7 +43,7 @@ declare namespace Base {
 	interface ModelConstructor<
 		Super extends Constructor
 	> {
-		new (): Model & InstanceType<Super>;
+		new(): Model & InstanceType<Super>;
 		readonly name: string;
 		readonly symbol: symbol;
 		has(_data: Data): Promise<boolean>;
@@ -58,11 +60,11 @@ declare namespace Base {
 
 export module Options {
 	interface Object<
-		S extends Constructor,
-		A extends Constructor,
-		B extends Constructor,
-		AD extends (Super: S) => A,
-		BD extends (Abstract: A) => B
+		S extends Constructor = Constructor,
+		A extends Constructor = Constructor,
+		B extends Constructor = Constructor,
+		AD extends (Super: S) => A = () => A,
+		BD extends (Abstract: A) => B = () => B,
 	> {
 		name: string;
 		Super: S;
@@ -85,12 +87,9 @@ export function defineModel<
 	_options: Options.Object<S, A, B, DA, DB>
 ): B;
 
-export module Data {
-
-}
-
 export module Options {
-
+	export const Schema: Schema<Options.Object>;
+	export function normalize(options: Options.Object): Options.Object;
 }
 
 export { defineModel as define };

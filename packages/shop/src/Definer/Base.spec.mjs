@@ -6,7 +6,7 @@ import * as Data from '../Data.mjs';
 import { BaseDefiner } from './Base.mjs';
 
 describe('::Definer::Base()', function () {
-	it('should createa a define().', function () {
+	it('should create a define().', function () {
 		const define = BaseDefiner(() => {});
 
 		assert.ok(typeof define === 'function');

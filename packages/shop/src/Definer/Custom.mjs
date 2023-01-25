@@ -7,6 +7,10 @@ const normalize = Normalizer(FieldSchema);
 
 function implement(targetField, options) {
 	for (const name in options) {
+		if (targetField[name] === undefined) {
+			throw new Error(`The member(${name}) is NOT declared.`);
+		}
+
 		Utils.defineValueMember(targetField, name, options[name]);
 	}
 }
