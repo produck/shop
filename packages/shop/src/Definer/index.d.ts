@@ -49,9 +49,22 @@ declare module CustomModule {
 		[key: string]: Function;
 	}
 
+	interface PrototypeField {
+		_load: (data: Model.Data) => Promise<Model.Data>;
+		_save?: (data: Model.Data) => Promise<Model.Data>;
+		_destroy?: (data: Model.Data) => Promise<void>;
+	}
+
+	interface ConstructorField {
+		_has: (data: Model.Data) => Promise<boolean>;
+		_get: (data: Model.Data) => Promise<Model.Data>;
+		_query: (filter: Model.Filter) => Promise<Model.Data[]>;
+		_create?: (data: Model.Data) => Promise<Model.Data>;
+	}
+
 	export function CustomDefiner(
-		prototype?: Field,
-		contructor?: Field
+		prototype?: Field & PrototypeField,
+		contructor?: Field & ConstructorField
 	): Entity.CustomDefiner;
 }
 

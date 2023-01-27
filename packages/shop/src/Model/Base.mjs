@@ -102,7 +102,7 @@ export function BaseModelClass(Abstract, {
 	});
 
 	if (deletable) {
-		const callDestroy = model => model.destroy;
+		const callDestroy = model => model.destroy();
 
 		Utils.defineValueMember(BaseModel, 'remove', async function remove(filter) {
 			const modelList = await this.query(filter);

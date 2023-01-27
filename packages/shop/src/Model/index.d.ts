@@ -1,7 +1,7 @@
 import { Schema } from '@produck/mold';
 
-type Data = any | null;
-type Filter = any;
+export type Data = any | null;
+export type Filter = any;
 
 export type Constructor = abstract new (...args: any) => any
 
@@ -94,6 +94,7 @@ export module Options {
 		data: <T>(_data: T) => T;
 		abstract: AD;
 		base: BD;
+		toJSON: (this: Base.ModelConstructor) => any;
 		creatable: boolean;
 		updatable: boolean;
 		deletable: boolean;
