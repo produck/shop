@@ -57,7 +57,7 @@ export namespace Base {
 		readonly name: string;
 		readonly symbol: symbol;
 		has(_data: Data): Promise<boolean>;
-		get(_data: Data): Promise<Model>;
+		get(_data: Data): Promise<Model | null>;
 		create?(_data: Data): Promise<Model>;
 		query(filter: Filter): Promise<Model[]>;
 		remove?(filter: Filter): Promise<Model[]>;
