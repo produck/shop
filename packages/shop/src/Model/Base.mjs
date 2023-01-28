@@ -89,8 +89,8 @@ export function BaseModelClass(Abstract, {
 		}
 	};
 
-	Utils.defineValueMember(BaseModel, 'query', async function query(filter) {
-		const _result = await this._query(filter);
+	Utils.defineValueMember(BaseModel, 'query', async function query(...args) {
+		const _result = await this._query(...args);
 
 		if (!T.Helper.Array(_result)) {
 			Throw.ImplementError(`Bad ${name} result when query(), one array expected.`);
@@ -104,8 +104,8 @@ export function BaseModelClass(Abstract, {
 	if (deletable) {
 		const callDestroy = model => model.destroy();
 
-		Utils.defineValueMember(BaseModel, 'remove', async function remove(filter) {
-			const modelList = await this.query(filter);
+		Utils.defineValueMember(BaseModel, 'remove', async function remove(...args) {
+			const modelList = await this.query(...args);
 
 			await Promise.all(modelList.map(callDestroy));
 
