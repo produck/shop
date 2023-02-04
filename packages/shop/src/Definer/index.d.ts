@@ -12,11 +12,18 @@ declare module AbstractModule {
 	): Model.AbstractDefiner<Object, Model.Abstract.ModelConstructor>
 }
 
+type MemberFunction = (this: Model.Base.Model, ...args: any[]) => any;
+
 declare module BaseModule {
 	interface Declarator {
 		Value(name: string, any: any): this;
-		Method(name: string, fn: Function): this;
-		Accessor(name: string, getter: Function, setter?: Function): this;
+		Method(name: string, fn: MemberFunction): this;
+
+		Accessor(
+			name: string,
+			getter: MemberFunction,
+			setter?: MemberFunction
+		): this;
 	}
 
 	interface PrototypeDeclarator extends Declarator {
