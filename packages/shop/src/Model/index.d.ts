@@ -1,7 +1,6 @@
 import { Schema } from '@produck/mold';
 
 export type Data = any | null;
-export type Filter = any;
 
 export type Constructor = abstract new (...args: any) => any
 
@@ -16,10 +15,10 @@ export namespace Abstract {
 		Super extends Constructor = ObjectConstructor
 	> {
 		new(): Model & InstanceType<Super>;
-		_has(data: Data): Promise<boolean>;
-		_get(data: Data): Promise<Data>;
-		_query(filter: any): Promise<Data[]>;
-		_create?(data: Data): Promise<Data>;
+		_has(...args: any[]): Promise<boolean>;
+		_get(...args: any[]): Promise<Data>;
+		_query(...args: any[]): Promise<Data[]>;
+		_create?(...args: any[]): Promise<Data>;
 	}
 
 	type CombinedModelConstructor<
@@ -56,11 +55,11 @@ export namespace Base {
 		new(): Model & InstanceType<Super>;
 		readonly name: string;
 		readonly symbol: symbol;
-		has(_data: Data): Promise<boolean>;
-		get(_data: Data): Promise<Model | null>;
-		create?(_data: Data): Promise<Model>;
-		query(filter: Filter): Promise<Model[]>;
-		remove?(filter: Filter): Promise<Model[]>;
+		has(...args: any[]): Promise<boolean>;
+		get(...args: any[]): Promise<Model | null>;
+		create?(...args: any[]): Promise<Model>;
+		query(...args: any[]): Promise<Model[]>;
+		remove?(...args: any[]): Promise<Model[]>;
 	}
 
 	type CombinedModelConstructor<

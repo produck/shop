@@ -1,7 +1,7 @@
 import { T, U } from '@produck/mold';
 
 import * as Utils from '../Utils.mjs';
-import * as D from '../Data.mjs';
+import { _, set as setData } from '../Data.mjs';
 
 function ThrowNamespace(name) {
 	const namespace = function Throw(message, ErrorConstructor = Error) {
@@ -47,9 +47,8 @@ export function BaseModelClass(Abstract, {
 		}
 	};
 
-	Utils.defineValueMember(BaseModel, 'has', async function has(_data) {
-		const data = Data(_data);
-		const _flag = await this._has(data);
+	Utils.defineValueMember(BaseModel, 'has', async function has(...args) {
+		const _flag = await this._has(...args);
 
 		if (typeof _flag !== 'boolean') {
 			Throw.ImplementError(`Bad ${name} flag when has(), one boolean expected.`);
@@ -58,26 +57,15 @@ export function BaseModelClass(Abstract, {
 		return _flag;
 	});
 
-	Utils.defineValueMember(BaseModel, 'get', async function get(_data) {
-		const data = Data(_data);
-		const incomingData = await this._get(data);
+	Utils.defineValueMember(BaseModel, 'get', async function get(...args) {
+		const _data = await this._get(...args);
 
-		if (incomingData === null) {
-			return null;
-		}
-
-		return new this(ensureData(incomingData));
+		return _data === null ? null : new this(ensureData(_data));
 	});
 
 	if (creatable) {
-		Utils.defineValueMember(BaseModel, 'create', async function create(_data) {
-			const data = Data(_data);
-
-			if (await this.has(data)) {
-				Throw(`Duplicated ${name} data.`);
-			}
-
-			return new this(ensureData(await this._create(data)));
+		Utils.defineValueMember(BaseModel, 'create', async function create(...args) {
+			return new this(ensureData(await this._create(...args)));
 		});
 	}
 
@@ -129,25 +117,25 @@ export function BaseModelClass(Abstract, {
 
 	Object.defineProperty(prototype, 'isDestroyed', {
 		get: function isDestroyed() {
-			return D._(this) === null;
+			return _(this) === null;
 		},
 	});
 
 	defineMethod('load', async function () {
-		const _data = await this._load(D._(this));
+		const _data = await this._load(_(this));
 		const data = _data === null ? null : ensureData(_data);
 
-		D.set(this, data);
+		setData(this, data);
 
 		return this;
 	});
 
 	if (updatable) {
 		defineMethod('save', async function () {
-			const _data = await this._save(D._(this));
+			const _data = await this._save(_(this));
 			const data = _data === null ? null : ensureData(_data);
 
-			D.set(this, data);
+			setData(this, data);
 
 			return this;
 		});
@@ -155,8 +143,8 @@ export function BaseModelClass(Abstract, {
 
 	if (deletable) {
 		defineMethod('destroy', async function () {
-			await this._destroy(D._(this));
-			D.set(this, null);
+			await this._destroy(_(this));
+			setData(this, null);
 
 			return this;
 		});

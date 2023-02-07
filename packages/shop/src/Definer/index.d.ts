@@ -63,10 +63,10 @@ declare module CustomModule {
 	}
 
 	interface ConstructorField {
-		_has: (data: Model.Data) => Promise<boolean>;
-		_get: (data: Model.Data) => Promise<Model.Data>;
-		_query: (filter: Model.Filter) => Promise<Model.Data[]>;
-		_create?: (data: Model.Data) => Promise<Model.Data>;
+		_has: (...args: any[]) => Promise<boolean>;
+		_get: (...args: any[]) => Promise<Model.Data>;
+		_query: (...args: any[]) => Promise<Model.Data[]>;
+		_create?: (...args: any[]) => Promise<Model.Data>;
 	}
 
 	export function CustomDefiner(
