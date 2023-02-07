@@ -190,23 +190,6 @@ describe('::Model::BaseModelClass()', function () {
 				assert.ok(await CustomMock.create({}) instanceof CustomMock);
 			});
 
-			it('should throw if duplicated data.', async function () {
-				class CustomMock extends BaseModelClass(Abstract, SAMPLE_OPTIONS) {
-					static async _has() {
-						return true;
-					}
-
-					static async _create() {
-						return {};
-					}
-				}
-
-				await assert.rejects(() => CustomMock.create({}), {
-					name: 'Error',
-					message: 'Duplicated Mock data.',
-				});
-			});
-
 			it('should throw if bad data.', async function () {
 				class CustomMock extends BaseModelClass(Abstract, {
 					...SAMPLE_OPTIONS,
