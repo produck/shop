@@ -1,0 +1,43 @@
+{
+	"name": "@produck/shop",
+	"version": "0.0.0",
+	"description": "Business model descriptor and definer independent to persistence.",
+	"keywords": [
+		"model"
+	],
+	"author": "chaoslee <chaos2lee@qq.com>",
+	"homepage": "https://github.com/produck/shop#readme",
+	"license": "MIT",
+	"files": [
+		"src",
+		"tsconfig.json"
+	],
+	"types": "src/index.d.ts",
+	"main": "src/index.cjs",
+	"type": "module",
+	"exports": {
+		"import": "./src/index.mjs",
+		"require": "./src/index.cjs"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/produck/shop.git"
+	},
+	"scripts": {
+		"build": "rollup -c script/rollup.config.mjs",
+		"prepublishOnly": " npm run build"
+	},
+	"bugs": {
+		"url": "https://github.com/produck/shop/issues"
+	},
+	"devDependencies": {
+		"mocha": "^10.2.0",
+		"rollup": "^4.9.2"
+	},
+	"dependencies": {
+		"@produck/mold": "^0.3.1"
+	}
+}

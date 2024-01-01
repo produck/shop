@@ -1,0 +1,20 @@
+{
+	"name": "@produck/shop-workspace",
+	"private": true,
+	"scripts": {
+		"deps:install": "npm -v && npm i",
+		"deps:ci-install": "npm i --include=optional",
+		"lint": "eslint --fix packages/**/*.mjs",
+		"test": "lerna run build:version && mocha \"packages/**/*-spec.mjs\" -t 999999999",
+		"coverage": "c8 --reporter=lcov npm run test",
+		"publish": "npm run lint && lerna publish --no-private"
+	},
+	"devDependencies": {
+		"c8": "^8.0.1",
+		"eslint": "^8.56.0",
+		"lerna": "^8.0.1"
+	},
+	"workspaces": [
+		"packages/shop"
+	]
+}
