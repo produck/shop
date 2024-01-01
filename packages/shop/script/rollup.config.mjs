@@ -9,7 +9,7 @@ const meta = require('../package.json');
 const BANNER =
 	'/*!\n' +
 	` * ${meta.name} v${meta.version}\n` +
-	` * (c) 2022-${new Date().getFullYear()} ChaosLee\n` +
+	` * (c) 2023-${new Date().getFullYear()} ChaosLee\n` +
 	` * Released under the ${meta.license} License.\n` +
 	' */';
 

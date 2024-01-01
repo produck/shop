@@ -2,10 +2,10 @@
 	"name": "@produck/shop-workspace",
 	"private": true,
 	"scripts": {
-		"deps:install": "npm -v && npm i",
-		"deps:ci-install": "npm i --include=optional",
+		"deps:install": "npm -v && npm install",
+		"deps:ci-install": "npm install --include=optional",
 		"lint": "eslint --fix packages/**/*.mjs",
-		"test": "lerna run build:version && mocha \"packages/**/*-spec.mjs\" -t 999999999",
+		"test": "npm run build:version --workspaces --if-present && mocha \"packages/**/*-spec.mjs\" -t 999999999",
 		"coverage": "c8 --reporter=lcov npm run test",
 		"publish": "npm run lint && lerna publish --no-private"
 	},
