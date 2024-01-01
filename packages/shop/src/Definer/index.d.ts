@@ -1,7 +1,7 @@
 import * as Model from '../Model';
 import * as Entity from '../Entity';
 
-declare module AbstractModule {
+declare module AbstractModel {
 	interface Field {
 		[key: string]: Function | null;
 	}
@@ -14,7 +14,7 @@ declare module AbstractModule {
 
 type MemberFunction = (this: Model.Base.Model, ...args: any[]) => any;
 
-declare module BaseModule {
+declare module BaseModel {
 	interface Declarator {
 		Value(name: string, any: any): this;
 		Method(name: string, fn: MemberFunction): this;
@@ -51,7 +51,7 @@ declare module BaseModule {
 	>;
 }
 
-declare module CustomModule {
+declare module CustomModel {
 	interface Field {
 		[key: string]: Function;
 	}
@@ -75,6 +75,6 @@ declare module CustomModule {
 	): Entity.CustomDefiner;
 }
 
-export const Abstract: typeof AbstractModule.AbstractDefiner;
-export const Base: typeof BaseModule.BaseDefiner;
-export const Custom: typeof CustomModule.CustomDefiner;
+export const Abstract: typeof AbstractModel.AbstractDefiner;
+export const Base: typeof BaseModel.BaseDefiner;
+export const Custom: typeof CustomModel.CustomDefiner;

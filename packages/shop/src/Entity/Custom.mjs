@@ -16,5 +16,9 @@ export function CustomModelClass(name, Base, define) {
 
 	Utils.defineValueMember(CustomModel, 'name', CLASS_NAME);
 
+	Utils.defineValueMember(CustomModel, 'isEntityOf', function isEntityOf(Model) {
+		return Model === Base;
+	});
+
 	return CustomModel;
 }
