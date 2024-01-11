@@ -1,21 +1,14 @@
+import { throwShopError } from './Error.mjs';
 import { AbstractModel } from './Abstract.mjs';
 
-class ShopError extends Error {
-	get name() {
-		return 'ShopError';
-	}
+function OperationNotSupported() {
+	throwShopError('Operation is NOT supported.');
 }
 
-const throwShopError = message => {
-	throw new ShopError(message);
-};
-
-const { freeze } = Object;
-
 export function defineModel(Origin, options) {
-	const CLASS_NAME = `${Origin.name}Model`;
+	const MODEL_CLASS_NAME = `${Origin.name}Model`;
 
-	const Assert = {
+	const Assert = Object.freeze({
 		Data: data => {
 			if (!options.schema.data(data)) {
 				throwShopError('Bad data.');
@@ -31,72 +24,41 @@ export function defineModel(Origin, options) {
 				throwShopError('Bad filter.');
 			}
 		},
-	};
+	});
 
-	function fromData(data) {
-		Assert.Data(data);
-
-		const origin = new Origin(...options.args(data));
-		const model = new Model(origin);
-
-		return model;
-	}
-
-	const Model = freeze({ [CLASS_NAME]: class extends AbstractModel {
-		origin;
-
-		#at = 0;
-		#data = {};
-
-		data = new Proxy(this.#data, {
-			set(target, property, value) {
-				target[property] = value;
-
-				return true;
-			},
-		});
-
+	const Model = { [MODEL_CLASS_NAME]: class extends AbstractModel {
 		get key() {
-			return null;
+			const key = options.key(this.data);
+
+			Assert.Key(key);
+
+			return key;
 		}
 
-		get at() {
-			return new Date(this.#at);
+		get origin() {
+			return options.origin(this.data);
 		}
 
 		async save() {
-			if (!options.mutable) {
-				throwShopError('The model is NOT mutable.');
-			}
-
-			options.write(this.origin, this.#data);
-			Assert.Data(this.#data);
-			await this._save(this.#data);
-			this.#at = Date.now();
+			Assert.Data(this.data);
+			await super.save();
 		}
 
 		async load() {
-			await this._load(this.#data);
-			Assert.Data(this.#data);
-			options.read(this.origin, this.#data);
-			this.#at = Date.now();
+			await super.load();
+			Assert.Data(this.data);
 		}
 
-		async destroy() {
-			if (!options.deletable) {
-				throwShopError('The model is NOT deletable.');
-			}
-
-			Assert.Data(this.#data);
-			await this._save(this.#data);
-		}
-
-		isDestroyed() {
-
-		}
 		static async has(key) {
 			Assert.Key(key);
-			await this._has(key);
+
+			const flag = await this._has(key);
+
+			if (typeof flag !== 'boolean') {
+				throwShopError('Bad flag.');
+			}
+
+			return flag;
 		}
 
 		static async get(key) {
@@ -104,7 +66,13 @@ export function defineModel(Origin, options) {
 
 			const data = await this._get(key);
 
-			return fromData(data);
+			if (data === null) {
+				return null;
+			}
+
+			Assert.Data(data);
+
+			return new this(data);
 		}
 
 		static async query(filter) {
@@ -116,25 +84,31 @@ export function defineModel(Origin, options) {
 				throwShopError('Bad data list as querying result.');
 			}
 
-			return list.map(data => fromData(data));
+			return list.map(data => {
+				Assert.Data(data);
+
+				return new this(data);
+			});
 		}
 
 		static async create(data) {
-			if (!options.creatable) {
-				throwShopError('The model is NOT creatable.');
-			}
+			Assert.Data(data);
 
-			const model = fromData(data);
-
-			await model.save();
+			return await super.create(data);
 		}
+	} }[MODEL_CLASS_NAME];
 
-		constructor(origin) {
-			super();
-			this.origin = origin;
-			freeze(this);
-		}
-	} }[CLASS_NAME]);
+	if (!options.creatable) {
+		Model.create = OperationNotSupported;
+	}
 
-	return Model;
+	if (!options.mutable) {
+		Model.prototype.save = OperationNotSupported;
+	}
+
+	if (!options.deletable) {
+		Model.prototype.destroy = OperationNotSupported;
+	}
+
+	return Object.freeze(Model);
 }
